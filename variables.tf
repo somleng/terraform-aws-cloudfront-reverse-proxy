@@ -1,3 +1,9 @@
+variable "create_certificate" {
+  description = "Whether to create ACM certificate"
+  type        = bool
+  default     = true
+}
+
 variable "origin_domain_name" {
   type        = string
   description = "The DNS domain name of your custom origin (e.g. twilreapi.somleng.org)"
@@ -5,7 +11,7 @@ variable "origin_domain_name" {
 
 variable "domain_name" {
   type        = string
-  description = "The DNS domain name of your domain name (e.g. api.example.com)"
+  description = "The DNS domain name of your domain name (e.g. example.com)"
 }
 
 variable "host_name" {
