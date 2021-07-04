@@ -4,6 +4,12 @@ variable "create_certificate" {
   default     = true
 }
 
+variable "certificate_arn" {
+  description = "The certificate of your domain (eg. *.example.com)"
+  type        = bool
+  default     = null
+}
+
 variable "origin_domain_name" {
   type        = string
   description = "The DNS domain name of your custom origin (e.g. twilreapi.somleng.org)"

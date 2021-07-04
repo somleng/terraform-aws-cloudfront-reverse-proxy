@@ -8,6 +8,8 @@ locals {
 }
 
 resource "aws_acm_certificate" "this" {
+  count = var.create_certificate ? 1 : 0
+
   domain_name       = "*.${var.domain_name}"
   validation_method = "DNS"
   provider          = aws.us-east-1
@@ -15,7 +17,7 @@ resource "aws_acm_certificate" "this" {
 
 resource "aws_route53_record" "certificate_validation" {
   for_each = {
-    for dvo in aws_acm_certificate.this.domain_validation_options : dvo.domain_name => {
+    for dvo in (var.create_certificate ? aws_acm_certificate.this[0].domain_validation_options : []) : dvo.domain_name => {
       name   = dvo.resource_record_name
       record = dvo.resource_record_value
       type   = dvo.resource_record_type
@@ -31,8 +33,10 @@ resource "aws_route53_record" "certificate_validation" {
 }
 
 resource "aws_acm_certificate_validation" "this" {
-  certificate_arn         = aws_acm_certificate.this.arn
-  validation_record_fqdns = [for record in aws_route53_record.certificate_validation : record.fqdn]
+  count = var.create_certificate ? 1 : 0
+
+  certificate_arn         = aws_acm_certificate.this[0].arn
+  validation_record_fqdns = [for record in aws_route53_record.certificate_validation[0] : record.fqdn]
   provider                = aws.us-east-1
 }
 
@@ -82,7 +86,7 @@ resource "aws_cloudfront_distribution" "this" {
   }
 
   viewer_certificate {
-    acm_certificate_arn      = aws_acm_certificate.this.arn
+    acm_certificate_arn      = var.create_certificate ? aws_acm_certificate.this[0].arn : var.certificate_arn
     ssl_support_method       = "sni-only"
     minimum_protocol_version = "TLSv1.2_2018"
   }
