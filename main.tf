@@ -40,6 +40,14 @@ resource "aws_acm_certificate_validation" "this" {
   provider                = aws.us-east-1
 }
 
+data "aws_cloudfront_cache_policy" "caching_disabled" {
+  name = "Managed-CachingDisabled"
+}
+
+data "aws_cloudfront_origin_request_policy" "all_viewer" {
+  name = "Managed-AllViewer"
+}
+
 resource "aws_cloudfront_distribution" "this" {
   origin {
     domain_name = var.origin_domain_name
@@ -48,8 +56,16 @@ resource "aws_cloudfront_distribution" "this" {
     custom_origin_config {
       http_port = 80
       https_port = 443
-      origin_ssl_protocols = ["TLSv1", "TLSv1.1", "TLSv1.2"]
+      origin_ssl_protocols = var.origin_ssl_protocols
       origin_protocol_policy = "https-only"
+    }
+
+    dynamic "custom_header" {
+      for_each = var.origin_custom_headers
+      content {
+        name = custom_header.value["name"]
+        value = custom_header.value["value"]
+      }
     }
   }
 
@@ -62,27 +78,8 @@ resource "aws_cloudfront_distribution" "this" {
     viewer_protocol_policy = "redirect-to-https"
     target_origin_id = var.origin_domain_name
 
-    min_ttl                = 0
-    default_ttl            = 86400
-    max_ttl                = 86400
-
-    forwarded_values {
-      query_string = true
-
-      cookies {
-        forward = "all"
-      }
-
-      headers = [
-        "Accept",
-        "Accept-Charset",
-        "Accept-Encoding",
-        "Accept-Datetime",
-        "Accept-Language",
-        "Authorization",
-        "Referer"
-      ]
-    }
+    cache_policy_id = data.aws_cloudfront_cache_policy.caching_disabled.id
+    origin_request_policy_id = data.aws_cloudfront_origin_request_policy.all_viewer.id
   }
 
   viewer_certificate {

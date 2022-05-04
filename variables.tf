@@ -29,3 +29,12 @@ variable "zone_id" {
   description = "The ID of the hosted zone to contain this record."
   type        = string
 }
+
+variable "origin_ssl_protocols" {
+  type = list(string)
+  default = ["TLSv1.2"]
+}
+
+variable "origin_custom_headers" {
+  type = list(map(string))
+}
