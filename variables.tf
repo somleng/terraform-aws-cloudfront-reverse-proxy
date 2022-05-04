@@ -6,7 +6,7 @@ variable "create_certificate" {
 
 variable "certificate_arn" {
   description = "The certificate of your domain (eg. *.example.com)"
-  type        = bool
+  type        = string
   default     = null
 }
 
@@ -37,4 +37,5 @@ variable "origin_ssl_protocols" {
 
 variable "origin_custom_headers" {
   type = list(map(string))
+  default = []
 }
