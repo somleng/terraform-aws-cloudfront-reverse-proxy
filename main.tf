@@ -147,6 +147,8 @@ resource "aws_cloudfront_distribution" "this" {
 }
 
 resource "aws_route53_record" "this" {
+  count = var.zone_id ? 1 : 0
+
   zone_id = var.zone_id
   name    = var.host_name
   type    = "A"

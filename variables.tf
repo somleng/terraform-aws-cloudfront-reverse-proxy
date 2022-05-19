@@ -12,7 +12,7 @@ variable "certificate_arn" {
 
 variable "origin_domain_name" {
   type        = string
-  description = "The DNS domain name of your custom origin (e.g. twilreapi.somleng.org)"
+  description = "The DNS domain name of your custom origin (e.g. dashboard.somleng.org)"
 }
 
 variable "domain_name" {
@@ -28,6 +28,7 @@ variable "host_name" {
 variable "zone_id" {
   description = "The ID of the hosted zone to contain this record."
   type        = string
+  default = null
 }
 
 variable "origin_ssl_protocols" {
