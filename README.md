@@ -5,7 +5,7 @@ Terraform module which creates AWS CloudFront resources as a reverse proxy by Te
 ## Usage
 
 ```hcl
-module "dashboard_reverse_proxy" {
+module "reverse_proxy" {
   source = "github.com/somleng/terraform-aws-cloudfront-reverse-proxy"
 
   host = "dashboard.example.com"
