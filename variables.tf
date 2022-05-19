@@ -1,9 +1,3 @@
-variable "create_certificate" {
-  description = "Whether to create ACM certificate"
-  type        = bool
-  default     = true
-}
-
 variable "certificate_arn" {
   description = "The certificate of your domain (eg. *.example.com)"
   type        = string
