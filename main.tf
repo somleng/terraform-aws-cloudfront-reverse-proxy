@@ -4,7 +4,6 @@ provider "aws" {
 }
 
 locals {
-  endpoint = "${var.host_name}.${var.domain_name}"
   create_certificate = var.certificate_arn == null ? true : false
   create_route53_record = var.zone_id == null ? false : true
 }
@@ -12,7 +11,7 @@ locals {
 resource "aws_acm_certificate" "this" {
   count = local.create_certificate ? 1 : 0
 
-  domain_name       = local.endpoint
+  domain_name       = var.host
   validation_method = "DNS"
   provider          = aws.us-east-1
 }
@@ -43,7 +42,7 @@ resource "aws_acm_certificate_validation" "this" {
 }
 
 resource "aws_cloudfront_cache_policy" "this" {
-  name    = replace("${local.endpoint}-proxy", ".", "-")
+  name    = replace("${var.host}-proxy", ".", "-")
 
   default_ttl = 0
   max_ttl     = 1
@@ -70,7 +69,7 @@ resource "aws_cloudfront_cache_policy" "this" {
 }
 
 resource "aws_cloudfront_origin_request_policy" "this" {
-  name    = replace("${local.endpoint}-proxy", ".", "-")
+  name    = replace("${var.host}-proxy", ".", "-")
 
   cookies_config {
     cookie_behavior = "all"
@@ -98,8 +97,8 @@ resource "aws_cloudfront_origin_request_policy" "this" {
 
 resource "aws_cloudfront_distribution" "this" {
   origin {
-    domain_name = var.origin_domain_name
-    origin_id   = var.origin_domain_name
+    domain_name = var.origin
+    origin_id   = var.origin
 
     custom_origin_config {
       http_port = 80
@@ -110,7 +109,7 @@ resource "aws_cloudfront_distribution" "this" {
 
     custom_header {
       name = "X-Forwarded-Host"
-      value = local.endpoint
+      value = var.host
     }
 
     dynamic "custom_header" {
@@ -122,14 +121,14 @@ resource "aws_cloudfront_distribution" "this" {
     }
   }
 
-  aliases = [local.endpoint]
+  aliases = [var.host]
   enabled = true
 
   default_cache_behavior {
     allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
     cached_methods   = ["GET", "HEAD"]
     viewer_protocol_policy = "redirect-to-https"
-    target_origin_id = var.origin_domain_name
+    target_origin_id = var.origin
 
     cache_policy_id = aws_cloudfront_cache_policy.this.id
     origin_request_policy_id = aws_cloudfront_origin_request_policy.this.id
@@ -152,7 +151,7 @@ resource "aws_route53_record" "this" {
   count = local.create_route53_record ? 1 : 0
 
   zone_id = var.zone_id
-  name    = var.host_name
+  name    = var.host
   type    = "A"
 
   alias {

@@ -4,19 +4,14 @@ variable "certificate_arn" {
   default     = null
 }
 
-variable "origin_domain_name" {
+variable "origin" {
   type        = string
   description = "The DNS domain name of your custom origin (e.g. dashboard.somleng.org)"
 }
 
-variable "domain_name" {
+variable "host" {
   type        = string
-  description = "The DNS domain name of your domain name (e.g. example.com)"
-}
-
-variable "host_name" {
-  type        = string
-  description = "The host name of your domain name."
+  description = "The DNS domain name of your host. (e.g. dashboard.example.com)"
 }
 
 variable "zone_id" {
