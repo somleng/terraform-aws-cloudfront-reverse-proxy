@@ -118,7 +118,7 @@ resource "aws_cloudfront_distribution" "this" {
 
     custom_header {
       name = "X-Forwarded-Host"
-      value = var.host
+      value = var.origin
     }
 
     dynamic "custom_header" {
