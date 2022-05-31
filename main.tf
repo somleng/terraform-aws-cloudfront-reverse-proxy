@@ -41,10 +41,6 @@ resource "aws_acm_certificate_validation" "this" {
   provider                = aws.us-east-1
 }
 
-data "aws_cloudfront_origin_request_policy" "user_agent_referer_headers" {
-  name = "Managed-UserAgentRefererHeaders"
-}
-
 resource "aws_cloudfront_cache_policy" "this" {
   name    = replace("${var.host}-proxy", ".", "-")
 
@@ -112,13 +108,8 @@ resource "aws_cloudfront_distribution" "this" {
     }
 
     custom_header {
-      name = "Origin"
-      value = "https://${var.origin}"
-    }
-
-    custom_header {
       name = "X-Forwarded-Host"
-      value = var.origin
+      value = var.host
     }
 
     dynamic "custom_header" {
@@ -140,7 +131,7 @@ resource "aws_cloudfront_distribution" "this" {
     target_origin_id = var.origin
 
     cache_policy_id = aws_cloudfront_cache_policy.this.id
-    origin_request_policy_id = data.aws_cloudfront_origin_request_policy.user_agent_referer_headers.id
+    origin_request_policy_id = aws_cloudfront_origin_request_policy.this.id
   }
 
   viewer_certificate {
