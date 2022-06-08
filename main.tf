@@ -107,11 +107,6 @@ resource "aws_cloudfront_distribution" "this" {
       origin_protocol_policy = "https-only"
     }
 
-    custom_header {
-      name = "X-Forwarded-Host"
-      value = var.host
-    }
-
     dynamic "custom_header" {
       for_each = var.origin_custom_headers
       content {
