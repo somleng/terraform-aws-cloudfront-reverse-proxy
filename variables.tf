@@ -29,3 +29,8 @@ variable "origin_custom_headers" {
   type = list(map(string))
   default = []
 }
+
+variable "allowed_origin_request_headers" {
+  type = list(string)
+  default = []
+}
